@@ -1,0 +1,47 @@
+import { type NextRequest, NextResponse } from "next/server";
+import { fetchEconomicNews } from "@/lib/news";
+import { generateKoreanDigest } from "@/lib/claude";
+import { sendDigestEmail } from "@/lib/email";
+
+// Vercel Cron이 매일 23:00 UTC (= 오전 8시 KST)에 이 엔드포인트를 호출합니다.
+// 수동 테스트: curl -H "Authorization: Bearer $CRON_SECRET" https://yourdomain.com/api/send-digest
+
+export async function GET(req: NextRequest) {
+  const authHeader = req.headers.get("authorization");
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (!cronSecret) {
+    console.error("CRON_SECRET 환경 변수가 설정되지 않았습니다.");
+    return NextResponse.json({ error: "서버 설정 오류" }, { status: 500 });
+  }
+
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "인증 실패" }, { status: 401 });
+  }
+
+  try {
+    console.log("[send-digest] 뉴스 가져오는 중...");
+    const articles = await fetchEconomicNews();
+    console.log(`[send-digest] ${articles.length}개 기사 가져옴`);
+
+    console.log("[send-digest] Claude로 한국어 요약 생성 중...");
+    const digest = await generateKoreanDigest(articles);
+    console.log(
+      `[send-digest] 요약 완료: 기사 ${digest.articles.length}개, 용어 ${digest.learningSection.length}개`
+    );
+
+    console.log("[send-digest] Resend로 이메일 발송 중...");
+    await sendDigestEmail(digest);
+    console.log("[send-digest] 이메일 발송 완료");
+
+    return NextResponse.json({
+      ok: true,
+      articlesCount: digest.articles.length,
+      termsCount: digest.learningSection.length,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[send-digest] 오류:", message);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
