@@ -1,16 +1,15 @@
-import { fetchEconomicNews } from "@/lib/news";
-import { generateKoreanDigest, type KoreanDigest } from "@/lib/claude";
+import { getDailyDigest } from "@/lib/digest";
+import type { KoreanDigest } from "@/lib/claude";
 
-// 1시간마다 페이지를 재생성 (ISR)
-export const revalidate = 3600;
+// 동적 렌더링 — unstable_cache가 Claude/NewsAPI 호출을 하루 1번으로 제한
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   let digest: KoreanDigest | null = null;
   let error: string | null = null;
 
   try {
-    const articles = await fetchEconomicNews();
-    digest = await generateKoreanDigest(articles);
+    digest = await getDailyDigest();
   } catch (err) {
     console.error("뉴스 생성 실패:", err);
     error =

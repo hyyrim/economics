@@ -138,7 +138,7 @@ ${articleList}
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 4096,
+    max_tokens: 8096,
     messages: [{ role: "user", content: prompt }],
   });
 
@@ -147,11 +147,12 @@ ${articleList}
     .map((block) => (block as { type: "text"; text: string }).text)
     .join("");
 
-  // Strip markdown code fences if Claude adds them despite instructions
-  const jsonString = rawContent
-    .replace(/^```(?:json)?\s*/m, "")
-    .replace(/\s*```$/m, "")
-    .trim();
+  // JSON 블록만 추출 (마크다운 코드펜스 무시)
+  const start = rawContent.indexOf("{");
+  const end = rawContent.lastIndexOf("}");
+  const jsonString = start !== -1 && end !== -1
+    ? rawContent.slice(start, end + 1)
+    : rawContent.trim();
 
   let parsed: ClaudeDigestResponse;
   try {

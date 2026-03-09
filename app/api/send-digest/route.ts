@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { fetchEconomicNews } from "@/lib/news";
-import { generateKoreanDigest } from "@/lib/claude";
+import { revalidateTag } from "next/cache";
+import { getDailyDigest } from "@/lib/digest";
 import { sendDigestEmail } from "@/lib/email";
 
 // Vercel Cron이 매일 23:00 UTC (= 오전 8시 KST)에 이 엔드포인트를 호출합니다.
@@ -20,14 +20,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    console.log("[send-digest] 뉴스 가져오는 중...");
-    const articles = await fetchEconomicNews();
-    console.log(`[send-digest] ${articles.length}개 기사 가져옴`);
+    // 기존 캐시 무효화 → 오늘자 뉴스를 새로 fetch & Claude 요약
+    revalidateTag("daily-digest");
 
-    console.log("[send-digest] Claude로 한국어 요약 생성 중...");
-    const digest = await generateKoreanDigest(articles);
+    console.log("[send-digest] 오늘의 다이제스트 생성 중...");
+    const digest = await getDailyDigest();
     console.log(
-      `[send-digest] 요약 완료: 기사 ${digest.articles.length}개, 용어 ${digest.learningSection.length}개`
+      `[send-digest] 완료: 기사 ${digest.articles.length}개, 용어 ${digest.learningSection.length}개`
     );
 
     console.log("[send-digest] Resend로 이메일 발송 중...");
