@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
-import { getDailyDigest } from "@/lib/digest";
+import { refreshDailyDigest } from "@/lib/digest";
 import { sendDigestEmail } from "@/lib/email";
 
 // Vercel Cron이 매일 23:00 UTC (= 오전 8시 KST)에 이 엔드포인트를 호출합니다.
@@ -20,11 +19,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // 기존 캐시 무효화 → 오늘자 뉴스를 새로 fetch & Claude 요약
-    revalidateTag("daily-digest");
-
     console.log("[send-digest] 오늘의 다이제스트 생성 중...");
-    const digest = await getDailyDigest();
+    const digest = await refreshDailyDigest();
     console.log(
       `[send-digest] 완료: 기사 ${digest.articles.length}개, 용어 ${digest.learningSection.length}개`
     );

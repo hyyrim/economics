@@ -3,7 +3,7 @@
 글로벌 경제 뉴스를 매일 아침 8시에 한국어로 요약해서 이메일로 보내주는 웹사이트입니다.
 경제를 처음 공부하는 분들도 쉽게 이해할 수 있도록 AI가 뉴스를 번역하고 설명해 드립니다.
 
-**🔗 배포 링크: [https://economics-weld.vercel.app/](https://economics-weld.vercel.app/)**
+**🔗 배포 링크: [https://econ101-weld.vercel.app/](https://econ101-weld.vercel.app/)**
 
 ## 스크린샷
 
