@@ -1,9 +1,11 @@
 # 매일 아침 경제 공부 📰
 
-글로벌 경제 뉴스를 매일 아침 8시에 한국어로 요약해서 이메일로 보내주는 웹사이트입니다.
+글로벌 경제 뉴스를 매일 아침 8시에 한국어로 요약해서 이메일로 보내주는 웹사이트입니다.<br />
 경제를 처음 공부하는 분들도 쉽게 이해할 수 있도록 AI가 뉴스를 번역하고 설명해 드립니다.
 
 **🔗 배포 링크: [https://econ101-weld.vercel.app/](https://econ101-weld.vercel.app/)**
+<br />
+<br />
 
 ## 스크린샷
 
@@ -11,12 +13,18 @@
 |-----------|--------------|------------|
 | ![뉴스 요약 화면](public/screenshots/screenshot1.png) | ![경제 용어 화면](public/screenshots/screenshot2.png) | ![이메일 화면](public/screenshots/screenshot3.png) |
 
+<br />
+<br />
+
 ## 주요 기능
 
 - **매일 아침 이메일 발송** — 매일 08:00 KST에 글로벌 경제 뉴스 요약본 자동 발송
 - **한국어 AI 요약** — Claude AI가 영문 뉴스를 쉬운 한국어로 번역·설명
 - **경제 용어 학습** — 뉴스에 등장한 어려운 경제 용어를 초보자도 이해할 수 있게 풀어서 설명
 - **웹 대시보드** — 이메일 외에도 웹사이트에서 오늘의 뉴스를 바로 확인 가능
+
+<br />
+<br />
 
 ## 기술 스택
 
@@ -28,6 +36,9 @@
 | AI 요약 | Anthropic Claude (`claude-sonnet-4-6`) |
 | 이메일 발송 | Resend |
 | 배포 | Vercel (Cron Job) |
+
+<br />
+<br />
 
 ## 프로젝트 구조
 
@@ -44,6 +55,9 @@ lib/
   email.ts                # sendDigestEmail()
 vercel.json               # 크론 스케줄 설정 (23:00 UTC = 08:00 KST)
 ```
+
+<br />
+<br />
 
 ## 시작하기
 
@@ -72,6 +86,9 @@ npm run dev
 ```bash
 curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/send-digest
 ```
+
+<br />
+<br />
 
 ## 배포 (Vercel)
 
